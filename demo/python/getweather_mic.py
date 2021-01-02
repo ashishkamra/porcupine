@@ -153,18 +153,16 @@ class PorcupineDemo(Thread):
 def get_weather():
 
     # latitude and longitude to be parameterized, right now it is for Arlington, MA
-    url = "https://dark-sky.p.rapidapi.com/42.42, -71.16"
+    url = "https://dark-sky.p.rapidapi.com/42.42,-71.16"
 
     querystring = {"lang":"en","units":"auto"}
 
     headers = {
-        'x-rapidapi-key': "0dc878138cmshaa6ef0d63d6c977p159ce1jsne34821300b78",
+        'x-rapidapi-key': str(os.environ['DARK_SKY_API_KEY']),
         'x-rapidapi-host': "dark-sky.p.rapidapi.com"
     }
 
     response = requests.request("GET", url, headers=headers, params=querystring)
-    #print(response.json()["currently"]["summary"])
-    #pprint.pprint(response.text)
 
     return response.json()
 
@@ -172,18 +170,19 @@ def extract_spoken_weather(weather_response):
 
     #extract key pieces of weather information. To be parametrized later.
     current_summary = weather_response["currently"]["summary"]
+    current_temp = weather_response["currently"]["temperature"]
     current_feels_like_temp = weather_response["currently"]["apparentTemperature"]
-    rain_probability = weather_response["currently"]["precipProbability"]
+    #rain_probability = weather_response["currently"]["precipProbability"]
     
     next_hour_summary = weather_response["minutely"]["summary"]
-    next_forty_eight_hours_summary = weather_response["hourly"]["summary"]
+    #next_forty_eight_hours_summary = weather_response["hourly"]["summary"]
 
     # synthesize the above into a one string that can be spoken
-    spoken_weather = "Current weather summary is: " + current_summary + ".\n" + \
+    spoken_weather = "Current weather is: " + current_summary + ".\n" + \
+            "Current temperature is: " + str(current_temp) + " degrees fahrenheit.\n" + \
             "Current feels like temperature is: " + str(current_feels_like_temp) + " degrees fahrenheit.\n" + \
-            "Current probability of rain is: " + str(100*rain_probability) + " percent.\n" + \
-            "Next hour weather summary is: " + next_hour_summary + "\n" + \
-            "Next 2 days weather summary is: " + next_forty_eight_hours_summary + "\n"
+            "Weather in the next hour is likely to be: " + next_hour_summary + "\n"
+            #"Next 2 days weather summary is: " + next_forty_eight_hours_summary + "\n"
                         
     return spoken_weather
 
