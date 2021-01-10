@@ -168,22 +168,35 @@ def get_weather():
 
 def extract_spoken_weather(weather_response):
 
-    #extract key pieces of weather information. To be parametrized later.
-    current_summary = weather_response["currently"]["summary"]
-    current_temp = weather_response["currently"]["temperature"]
-    current_feels_like_temp = weather_response["currently"]["apparentTemperature"]
-    #rain_probability = weather_response["currently"]["precipProbability"]
+    #extract key pieces of weather information. To be parametrized later.i
+    hourly_weather_0_time = datetime.fromtimestamp(weather_response["hourly"]["data"][0]["time"]).strftime('%I:%M %p')
+    hourly_weather_1_time = datetime.fromtimestamp(weather_response["hourly"]["data"][1]["time"]).strftime('%I:%M %p')
+    #print (hourly_weather_0_time)
     
+    current_summary = weather_response["currently"]["summary"]
+    temp_hour_0 = round(weather_response["hourly"]["data"][0]["temperature"],1)
+    temp_hour_1 = round(weather_response["hourly"]["data"][1]["temperature"],1)
+    feels_temp_hour_0 = round(weather_response["hourly"]["data"][0]["apparentTemperature"],1)
+    feels_temp_hour_1 = round(weather_response["hourly"]["data"][1]["apparentTemperature"],1)
+   
+    today_high_temp = round(weather_response["daily"]["data"][0]["temperatureHigh"],1)
+    today_high_temp_time = datetime.fromtimestamp(weather_response["daily"]["data"][0]["temperatureHighTime"]).strftime('%I:%M %p')
+    today_min_temp = round(weather_response["daily"]["data"][0]["temperatureLow"],1)
+    today_low_temp_time = datetime.fromtimestamp(weather_response["daily"]["data"][0]["temperatureLowTime"]).strftime('%I:%M %p')
+
     next_hour_summary = weather_response["minutely"]["summary"]
-    #next_forty_eight_hours_summary = weather_response["hourly"]["summary"]
+    next_two_days_summary = weather_response["hourly"]["summary"]
+    next_seven_days_summary = weather_response["daily"]["summary"]
 
     # synthesize the above into a one string that can be spoken
-    spoken_weather = "Current weather is: " + current_summary + ".\n" + \
-            "Current temperature is: " + str(current_temp) + " degrees fahrenheit.\n" + \
-            "Current feels like temperature is: " + str(current_feels_like_temp) + " degrees fahrenheit.\n" + \
-            "Weather in the next hour is likely to be: " + next_hour_summary + "\n"
-            #"Next 2 days weather summary is: " + next_forty_eight_hours_summary + "\n"
-                        
+    spoken_weather = "\n" + \
+            "Temperature at " + hourly_weather_0_time + " is " + str(temp_hour_0) + ". " + \
+            "Feels like: " + str(feels_temp_hour_0) + ".\n" + \
+            "At " + hourly_weather_1_time + " it will be " + str(temp_hour_1) + ". " + \
+            "Feels like: " + str(feels_temp_hour_1) + ".\n" + \
+            "Today's high is: " + str(today_high_temp) + " at " + today_high_temp_time + ".\n" + \
+            "Today's low is: " + str(today_min_temp) + " at " + today_low_temp_time
+
     return spoken_weather
 
 def text_to_speech(data):
@@ -201,7 +214,7 @@ def text_to_speech(data):
     # Select the type of audio file you want returned
     audio_config = texttospeech.AudioConfig(
         audio_encoding=texttospeech.AudioEncoding.LINEAR16,
-        speaking_rate=1.00
+        speaking_rate=1.1
     )
 
     # Perform the text-to-speech request on the text input with the selected
